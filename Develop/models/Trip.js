@@ -13,11 +13,12 @@ Trip.init(
     },
     trip_budget: {
       type: DataTypes.INTEGER,
-      allowNull: false,
+      allowNull: true,
     },
     traveller_amount: {
       type: DataTypes.INTEGER,
       allowNull: false,
+      defaultValue: 1,
     },
     traveller_id: {
       type: DataTypes.INTEGER,

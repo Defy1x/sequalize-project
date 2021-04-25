@@ -1,28 +1,26 @@
 const router = require('express').Router();
-const { Trip, Location, Traveller } = require('../../models');
+const { Location, Traveller, Trip } = require('../../models');
 
-// GET all travellers and locations
-router.get('/location', async (req, res) => {
+// GET all locations
+router.get('/', async (req, res) => {
   try {
-    const locationData = await Traveller.findAll({
-      include: [{ model: Traveller }, { model: Location }],
-    });
+    const locationData = await Location.findAll();
     res.status(200).json(locationData);
   } catch (err) {
     res.status(500).json(err);
   }
 });
 
-//NEED TO DO POST
-
-router.get('/location/:id', async (req, res) => {
+// GET a single location
+router.get('/:id', async (req, res) => {
   try {
     const locationData = await Location.findByPk(req.params.id, {
-      include: [{ model: Location }],
+      // JOIN with travellers, using the Trip through table
+      include: [{ model: Traveller, through: Trip, as: 'location_travellers' }]
     });
 
     if (!locationData) {
-      res.status(404).json({ message: 'No Location found with that id!' });
+      res.status(404).json({ message: 'No location found with this id!' });
       return;
     }
 
@@ -32,15 +30,27 @@ router.get('/location/:id', async (req, res) => {
   }
 });
 
-// delete a single location
-router.delete('/location/:id', async (req, res) => {
+// CREATE a location
+router.post('/', async (req, res) => {
   try {
-    const locationData = await Location.findByPk(req.params.id, {
-      include: [{ model: Location }],
+    const locationData = await Location.create(req.body);
+    res.status(200).json(locationData);
+  } catch (err) {
+    res.status(400).json(err);
+  }
+});
+
+// DELETE a location
+router.delete('/:id', async (req, res) => {
+  try {
+    const locationData = await Location.destroy({
+      where: {
+        id: req.params.id
+      }
     });
 
     if (!locationData) {
-      res.status(404).json({ message: 'No Location found with that id!' });
+      res.status(404).json({ message: 'No location found with this id!' });
       return;
     }
 

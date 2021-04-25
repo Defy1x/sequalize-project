@@ -1,30 +1,26 @@
 const router = require('express').Router();
-const { Trip, Location, Traveller } = require('../../models');
+const { Trip } = require('../../models');
 
-// GET all travellers and locations
-router.get('/trips', async (req, res) => {
+// CREATE a trip
+router.post('/', async (req, res) => {
   try {
-    const tripData = await Traveller.findAll({
-      include: [{ model: Traveller }, { model: Location }],
-    });
+    const tripData = await Trip.create(req.body);
     res.status(200).json(tripData);
   } catch (err) {
-    res.status(500).json(err);
+    res.status(400).json(err);
   }
 });
 
-// delete a single trip
-router.delete('/trips/:id', async (req, res) => {
+// DELETE a trip
+router.delete('/:id', async (req, res) => {
   try {
-    const tripData = await Trip.findByPk(req.params.id, {
-      include: [{ model: Trip }],
+    const tripData = await Trip.destroy({
+      where: { id: req.params.id }
     });
-
     if (!tripData) {
-      res.status(404).json({ message: 'No trip found with that id!' });
+      res.status(404).json({ message: 'No trip with this id!' });
       return;
     }
-
     res.status(200).json(tripData);
   } catch (err) {
     res.status(500).json(err);
